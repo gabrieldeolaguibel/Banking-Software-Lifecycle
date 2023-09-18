@@ -1,0 +1,27 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environmentType": {
+            "value": "nonprod"
+        },
+        "postgreSQLServerName": {
+            "value": "aguadamillas-dbsrv-dev"
+        },
+        "postgreSQLDatabaseName": {
+            "value": "aguadamillas-db-dev"
+        },
+        "appServicePlanName": {
+            "value": "aguadamillas-asp-dev"
+        },
+        "appServiceAPIAppName": {
+            "value": "aguadamillas-be-dev"
+        },
+        "appServiceAppName": {
+            "value": "aguadamillas-fe-dev"
+        },
+        "location": {
+            "value": "North Europe"
+        }
+    }
+}
