@@ -1,48 +1,49 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "type": "msedge",
-        "request": "launch",
-        "name": "IE Bank Frontend",
-        "url": "http://localhost:8080",
-        "webRoot": "${workspaceFolder}/ie-bank-fe",
-        "breakOnLoad": true,
-        "pathMapping": {
-          "/_karma_webpack_": "${workspaceFolder}/ie-bank-fe"
-        },
-        "sourceMapPathOverrides": {
-          "webpack:/*": "${webRoot}/*",
-          "/./*": "${webRoot}/*",
-          "/src/*": "${webRoot}/*",
-          "/*": "*",
-          "/./~/*": "${webRoot}/node_modules/*"
-        },
-        "preLaunchTask": "vuejs: start"
+  "version": "0.2.0",
+  "configurations": [
+
+    {
+      "type": "msedge",
+      "request": "launch",
+      "name": "IE Bank Frontend",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}/ie-bank-fe",
+      "breakOnLoad": true,
+      "pathMapping": {
+        "/_karma_webpack_": "${workspaceFolder}/ie-bank-fe"
       },
-      {
-        "name": "Python: Flask",
-        "type": "python",
-        "request": "launch",
-        "module": "flask",
-        "env": {
-          "FLASK_APP": "app.py",
-          "FLASK_DEBUG": "1",
-          "ENV": "local",
-          "DBUSER": "",
-          "DBPASS": "",
-          "DBHOST": "",
-          "DBNAME": ""
-        },
-        "args": [
-          "run",
-          "--no-debugger",
-          "--no-reload"
-        ],
-        "jinja": true,
-        "justMyCode": true,
-        "cwd": "${workspaceFolder}/ie-bank-be"
-      }
-    ]
-  }
-  
+      "sourceMapPathOverrides": {
+        "webpack:/*": "${webRoot}/*",
+        "/./*": "${webRoot}/*",
+        "/src/*": "${webRoot}/*",
+        "/*": "*",
+        "/./~/*": "${webRoot}/node_modules/*"
+      },
+      "preLaunchTask": "vuejs: start"
+    },
+    {
+      "name": "Python: Flask",
+      "type": "python",
+      "request": "launch",
+      "module": "flask",
+      "env": {
+        "FLASK_APP": "app.py",
+        "FLASK_DEBUG": "1",
+        "ENV": "local",
+        "DBUSER": "",
+        "DBPASS": "",
+        "DBHOST": "",
+        "DBNAME": ""
+      },
+      "args": [
+        "run",
+        "--no-debugger",
+        "--no-reload"
+      ],
+      "jinja": true,
+      "justMyCode": true,
+      "cwd": "${workspaceFolder}/ie-bank-be",
+      "pythonPath": "/Users/gabrieldeolaguibel/IE/DevOps_Assignement1/Banking-Software-Lifecycle/ie-bank-be/venv/bin/python"
+    }
+  ]
+}
