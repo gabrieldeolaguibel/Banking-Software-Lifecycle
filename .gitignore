@@ -138,5 +138,8 @@ ie-bank-fe/.pnp.*
 # VS Code
 ie-bank-fe/.vscode
 
+# for the new root level debugger files
+.vscode
+
 
 
