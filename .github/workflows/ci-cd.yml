@@ -20,6 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Change to frontend directory
+        run: cd ie-bank-fe
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
@@ -30,6 +33,8 @@ jobs:
           cd ie-bank-fe
           npm install
           npm run build -- --mode development --dest dist-dev
+        working-directory: ie-bank-fe
+        
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
