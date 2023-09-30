@@ -27,7 +27,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-          cache: 'npm'
+          #cache: 'npm'
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ie-bank-fe/node_modules
+          key: ${{ runner.OS }}-node-${{ hashFiles('ie-bank-fe/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+                
       - name: npm install, build, and test
         run: |
           cd ie-bank-fe
