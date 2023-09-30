@@ -3,7 +3,7 @@
   "configurations": [
 
     {
-      "type": "msedge",
+      "type": "chrome",
       "request": "launch",
       "name": "IE Bank Frontend",
       "url": "http://localhost:8080",
