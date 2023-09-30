@@ -125,8 +125,8 @@ jobs:
       - name: Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
-          subscriptionId: ${{ env.SUBSCRIPTION_ID_DEV }}
-          resourceGroupName: ${{ env.RESOURCE_GROUP_DEV }}
-          template: ie-bank-infra/main.bicep
-          parameters: ie-bank-infra/parameters/dev.parameters.json
+           subscriptionId: ${{ env.SUBSCRIPTION_ID_DEV }}
+           resourceGroupName: ${{ env.RESOURCE_GROUP_DEV }}
+           template: ./ie-bank-infra/main.bicep
+           parameters: ./ie-bank-infra/parameters/dev.parameters.json
 
