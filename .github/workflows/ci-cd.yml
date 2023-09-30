@@ -10,8 +10,8 @@ on:
     workflow_dispatch:
 
 env:
-  FRONTEND_WEBAPP_DEV: aguadamillas-fe-dev
-  BACKEND_WEBAPP_DEV: aguadamillas-be-dev
+  FRONTEND_WEBAPP_DEV: gdeolaguibel-fe-dev
+  BACKEND_WEBAPP_DEV: gdeolaguibel-be-dev
   RESOURCE_GROUP_DEV: aguadamillas_students_1
   SUBSCRIPTION_ID_DEV: e0b9cada-61bc-4b5a-bd7a-52c606726b3b
 
@@ -36,7 +36,7 @@ jobs:
           key: ${{ runner.OS }}-node-${{ hashFiles('ie-bank-fe/package-lock.json') }}
           restore-keys: |
             ${{ runner.OS }}-node-
-                
+
       - name: npm install, build, and test
         run: |
           cd ie-bank-fe
@@ -64,7 +64,7 @@ jobs:
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ env.FRONTEND_WEBAPP_DEV }}
+          app-name: ${{ env.FRONTEND_WEBAPP_DEV }} 
           package: .
 
   backend-build:
