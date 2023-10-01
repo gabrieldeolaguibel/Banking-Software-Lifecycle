@@ -3,7 +3,7 @@ ie-bank-be/.venv/
 ie-bank-be/__pycache__/
 ie-bank-be/.env
 ie-bank-be/.vscode
-ie-bank-be/.db/
+#ie-bank-be/.db/
 
 # Frontend (ie-bank-fe) specific rules
 
