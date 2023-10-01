@@ -10,8 +10,9 @@ on:
     workflow_dispatch:
 
 env:
-  FRONTEND_WEBAPP_DEV: aguadamillas-fe-dev
-  BACKEND_WEBAPP_DEV: aguadamillas-be-dev
+  USER_ALIAS: gdeolaguibel
+  FRONTEND_WEBAPP_DEV: ${{ env.USER_ALIAS }}-fe-dev
+  BACKEND_WEBAPP_DEV: ${{ env.USER_ALIAS }}-be-dev
   RESOURCE_GROUP_DEV: aguadamillas_students_1
   SUBSCRIPTION_ID_DEV: e0b9cada-61bc-4b5a-bd7a-52c606726b3b
 
@@ -128,5 +129,14 @@ jobs:
            subscriptionId: ${{ env.SUBSCRIPTION_ID_DEV }}
            resourceGroupName: ${{ env.RESOURCE_GROUP_DEV }}
            template: ie-bank-infra/main.bicep
-           parameters: ie-bank-infra/parameters/dev.parameters.json
+           parameters: >-
+             ie-bank-infra/parameters/dev.parameters.json
+             appServiceAPIEnvVarENV=${{ env.ENV }}
+             appServiceAPIEnvVarDBHOST=${{ env.DBHOST }}
+             appServiceAPIEnvVarDBNAME=${{ env.DBNAME }}
+             appServiceAPIEnvVarDBPASS=${{ secrets.DBPASS }}
+             appServiceAPIDBHostDBUSER=${{ secrets.DBUSER }}
+             appServiceAPIDBHostFLASK_APP=${{ env.FLASK_APP }}
+             appServiceAPIDBHostFLASK_DEBUG=${{ env.FLASK_DEBUG }}
+            deploymentName: ${{ env.USER_ALIAS }}
 
