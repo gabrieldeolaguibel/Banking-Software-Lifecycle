@@ -63,7 +63,7 @@ resource appServiceAPIApp 'Microsoft.Web/sites@2022-03-01' = {
         }
         {
           name: 'FLASK_APP'
-          value: appServiceAPIDBHostFLASK_APP # value comes from the appServiceAPIDBHostFLASK_APP parameter which is located in the appServiceAPIApp resource
+          value: appServiceAPIDBHostFLASK_APP 
         }
         {
           name: 'FLASK_DEBUG'
