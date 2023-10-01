@@ -2,6 +2,7 @@
     <div class="home-container">
       <h1>Welcome to IE Bank</h1>
       <p>Your trusted partner for all banking needs.</p>
+        <p>Shoutout to Alvaro Guadamillas if you're looking at this!</p>
       <div class="navigation-buttons">
         <router-link to="/skull" class="nav-button">Skull</router-link>
         <router-link to="/accounts" class="nav-button">Accounts</router-link>
