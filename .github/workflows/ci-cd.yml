@@ -21,15 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      #- name: Change to frontend directory
-        #run: cd ie-bank-fe
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-          #cache: 'npm'
-
       - name: Cache node modules
         uses: actions/cache@v2
         with:
@@ -37,14 +32,11 @@ jobs:
           key: ${{ runner.OS }}-node-${{ hashFiles('ie-bank-fe/package-lock.json') }}
           restore-keys: |
             ${{ runner.OS }}-node-
-
       - name: npm install, build, and test
         run: |
           cd ie-bank-fe
           npm install
           npm run build -- --mode development --dest dist-dev
-        #working-directory: ie-bank-fe
-
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
@@ -126,17 +118,16 @@ jobs:
       - name: Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
-           subscriptionId: ${{ env.SUBSCRIPTION_ID_DEV }}
-           resourceGroupName: ${{ env.RESOURCE_GROUP_DEV }}
-           template: ie-bank-infra/main.bicep
-           parameters: >-
-             ie-bank-infra/parameters/dev.parameters.json
-             appServiceAPIEnvVarENV=${{ env.ENV }}
-             appServiceAPIEnvVarDBHOST=${{ env.DBHOST }}
-             appServiceAPIEnvVarDBNAME=${{ env.DBNAME }}
-             appServiceAPIEnvVarDBPASS=${{ secrets.DBPASS }}
-             appServiceAPIDBHostDBUSER=${{ secrets.DBUSER }}
-             appServiceAPIDBHostFLASK_APP=${{ env.FLASK_APP }}
-             appServiceAPIDBHostFLASK_DEBUG=${{ env.FLASK_DEBUG }}
-            deploymentName: ${{ env.USER_ALIAS }}
-
+          subscriptionId: ${{ env.SUBSCRIPTION_ID_DEV }}
+          resourceGroupName: ${{ env.RESOURCE_GROUP_DEV }}
+          template: ie-bank-infra/main.bicep
+          parameters: >-
+            ie-bank-infra/parameters/dev.parameters.json
+            appServiceAPIEnvVarENV=${{ env.ENV }}
+            appServiceAPIEnvVarDBHOST=${{ env.DBHOST }}
+            appServiceAPIEnvVarDBNAME=${{ env.DBNAME }}
+            appServiceAPIEnvVarDBPASS=${{ secrets.DBPASS }}
+            appServiceAPIDBHostDBUSER=${{ secrets.DBUSER }}
+            appServiceAPIDBHostFLASK_APP=${{ env.FLASK_APP }}
+            appServiceAPIDBHostFLASK_DEBUG=${{ env.FLASK_DEBUG }}
+          deploymentName: ${{ env.USER_ALIAS }}
