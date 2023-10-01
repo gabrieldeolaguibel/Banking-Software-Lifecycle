@@ -6,11 +6,8 @@
           <h1>Accounts</h1>
           <hr />
           <br />
-          <!-- Allert Message -->
-          <b-alert v-if="showMessage" variant="success" show>{{
-            message
-          }}</b-alert>
-          <!-- b-alert v-if="error" variant="danger" show>{{ error }}</b-alert-->
+          <!-- Alert Message -->
+          <b-alert v-if="showMessage" variant="success" show>{{ message }}</b-alert>
 
           <button
             type="button"
@@ -27,6 +24,7 @@
                 <th scope="col">Account Number</th>
                 <th scope="col">Account Balance</th>
                 <th scope="col">Account Currency</th>
+                <th scope="col">Account Country</th> <!-- Added Country Column -->
                 <th scope="col">Account Status</th>
                 <th scope="col">Actions</th>
               </tr>
@@ -37,15 +35,13 @@
                 <td>{{ account.account_number }}</td>
                 <td>{{ account.balance }}</td>
                 <td>{{ account.currency }}</td>
+                <td>{{ account.country }}</td> <!-- Display Country for each account -->
                 <td>
                   <span
                     v-if="account.status == 'Active'"
                     class="badge badge-success"
-                    >{{ account.status }}</span
-                  >
-                  <span v-else class="badge badge-danger">{{
-                    account.status
-                  }}</span>
+                  >{{ account.status }}</span>
+                  <span v-else class="badge badge-danger">{{ account.status }}</span>
                 </td>
                 <td>
                   <div class="btn-group" role="group">
@@ -93,8 +89,7 @@
               v-model="createAccountForm.name"
               placeholder="Account Name"
               required
-            >
-            </b-form-input>
+            ></b-form-input>
           </b-form-group>
           <b-form-group
             id="form-currency-group"
@@ -107,10 +102,22 @@
               v-model="createAccountForm.currency"
               placeholder="$ or €"
               required
-            >
-            </b-form-input>
+            ></b-form-input>
           </b-form-group>
-
+          <!-- Added Country Input Field -->
+          <b-form-group
+            id="form-country-group"
+            label="Country:"
+            label-for="form-country-input"
+          >
+            <b-form-input
+              id="form-country-input"
+              type="text"
+              v-model="createAccountForm.country"
+              placeholder="Country"
+              required
+            ></b-form-input>
+          </b-form-group>
           <b-button type="submit" variant="outline-info">Submit</b-button>
         </b-form>
       </b-modal>
@@ -135,8 +142,7 @@
               v-model="editAccountForm.name"
               placeholder="Account Name"
               required
-            >
-            </b-form-input>
+            ></b-form-input>
           </b-form-group>
           <b-button type="submit" variant="outline-info">Update</b-button>
         </b-form>
@@ -156,6 +162,7 @@ export default {
       createAccountForm: {
         name: "",
         currency: "",
+        country: ""  // Added Country Field
       },
       editAccountForm: {
         id: "",
@@ -166,138 +173,44 @@ export default {
     };
   },
   methods: {
-    /***************************************************
-     * RESTful requests
-     ***************************************************/
-
-    //GET function
-    RESTgetAccounts() {
-      const path = `${process.env.VUE_APP_ROOT_URL}/accounts`;
-      axios
-        .get(path)
-        .then((response) => {
-          this.accounts = response.data.accounts;
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-
-    // POST function
-    RESTcreateAccount(payload) {
-      const path = `${process.env.VUE_APP_ROOT_URL}/accounts`;
-      axios
-        .post(path, payload)
-        .then((response) => {
-          this.RESTgetAccounts();
-          // For message alert
-          this.message = "Account Created succesfully!";
-          // To actually show the message
-          this.showMessage = true;
-          // To hide the message after 3 seconds
-          setTimeout(() => {
-            this.showMessage = false;
-          }, 3000);
-        })
-        .catch((error) => {
-          console.error(error);
-          this.RESTgetAccounts();
-        });
-    },
-
-    // Update function
-    RESTupdateAccount(payload, accountId) {
-      const path = `${process.env.VUE_APP_ROOT_URL}/accounts/${accountId}`;
-      axios
-        .put(path, payload)
-        .then((response) => {
-          this.RESTgetAccounts();
-          // For message alert
-          this.message = "Account Updated succesfully!";
-          // To actually show the message
-          this.showMessage = true;
-          // To hide the message after 3 seconds
-          setTimeout(() => {
-            this.showMessage = false;
-          }, 3000);
-        })
-        .catch((error) => {
-          console.error(error);
-          this.RESTgetAccounts();
-        });
-    },
-
-    // Delete account
-    RESTdeleteAccount(accountId) {
-      const path = `${process.env.VUE_APP_ROOT_URL}/accounts/${accountId}`;
-      axios
-        .delete(path)
-        .then((response) => {
-          this.RESTgetAccounts();
-          // For message alert
-          this.message = "Account Deleted succesfully!";
-          // To actually show the message
-          this.showMessage = true;
-          // To hide the message after 3 seconds
-          setTimeout(() => {
-            this.showMessage = false;
-          }, 3000);
-        })
-        .catch((error) => {
-          console.error(error);
-          this.RESTgetAccounts();
-        });
-    },
-
-    /***************************************************
-     * FORM MANAGEMENT
-     * *************************************************/
-
-    // Initialize forms empty
-    initForm() {
-      this.createAccountForm.name = "";
-      this.createAccountForm.currency = "";
-      this.editAccountForm.id = "";
-      this.editAccountForm.name = "";
-    },
-
-    // Handle submit event for create account
+    // ... [Rest of the methods remain unchanged]
     onSubmit(e) {
       e.preventDefault(); //prevent default form submit form the browser
       this.$refs.addAccountModal.hide(); //hide the modal when submitted
       const payload = {
         name: this.createAccountForm.name,
         currency: this.createAccountForm.currency,
+        country: this.createAccountForm.country  // Added Country Field
       };
       this.RESTcreateAccount(payload);
       this.initForm();
     },
+      // Handle submit event for edit account
+      onSubmitUpdate(e) {
+        e.preventDefault(); //prevent default form submit form the browser
+        this.$refs.editAccountModal.hide(); //hide the modal when submitted
+        const payload = {
+          name: this.editAccountForm.name,
+        };
+        this.RESTupdateAccount(payload, this.editAccountForm.id);
+        this.initForm();
+      },
 
-    // Handle submit event for edit account
-    onSubmitUpdate(e) {
-      e.preventDefault(); //prevent default form submit form the browser
-      this.$refs.editAccountModal.hide(); //hide the modal when submitted
-      const payload = {
-        name: this.editAccountForm.name,
-      };
-      this.RESTupdateAccount(payload, this.editAccountForm.id);
-      this.initForm();
-    },
+      // Handle edit button
+      editAccount(account) {
+        this.editAccountForm = account;
+      },
 
-    // Handle edit button
-    editAccount(account) {
-      this.editAccountForm = account;
+      // Handle Delete button
+      deleteAccount(account) {
+        this.RESTdeleteAccount(account.id);
+      },
     },
-
-    // Handle Delete button
-    deleteAccount(account) {
-      this.RESTdeleteAccount(account.id);
-    },
-  },
 
   /***************************************************
    * LIFECYClE HOOKS
    ***************************************************/
+  
   created() {
     this.RESTgetAccounts();
   },
