@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import Home from '../components/Home.vue';
 import Skull from '../components/Skull.vue'
 import AppAccounts from '../components/AppAccounts.vue'
 
@@ -9,7 +10,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: { template: '<div>Welcome to IE Bank!</div>'}
+    component: App
   },
   {
     path: '/skull',
