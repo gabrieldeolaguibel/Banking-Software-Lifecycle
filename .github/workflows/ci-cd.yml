@@ -1,0 +1,131 @@
+name: Unified CI/CD Pipeline
+
+on:
+    push:
+      branches:
+        - main
+    pull_request:
+      branches:
+        - main
+    workflow_dispatch:
+
+env:
+  USER_ALIAS: gdeolaguibel
+  RESOURCE_GROUP_DEV: aguadamillas_students_1
+  SUBSCRIPTION_ID_DEV: e0b9cada-61bc-4b5a-bd7a-52c606726b3b
+
+jobs:
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ie-bank-fe/node_modules
+          key: ${{ runner.OS }}-node-${{ hashFiles('ie-bank-fe/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+      - name: npm install, build, and test
+        run: |
+          cd ie-bank-fe
+          npm install
+          npm run build -- --mode development --dest dist-dev
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: node-app-dev
+          path: ie-bank-fe/dist-dev/
+
+  frontend-deploy:
+    runs-on: ubuntu-latest
+    needs: frontend-build
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: node-app-dev
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: 'Deploy to Azure Web App'
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.USER_ALIAS }}-fe-dev
+          package: .
+
+  backend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+      - name: Upgrade pip and Install dependencies
+        run: |
+          cd ie-bank-be
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Lint with flake8
+        run: |
+          cd ie-bank-be
+          pip install flake8 pytest
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Test with pytest
+        run: |
+          cd ie-bank-be
+          python -m pytest --cov=iebank_api -v
+      - name: Upload artifact for deployment jobs
+        uses: actions/upload-artifact@v2
+        with:
+          name: python-app
+          path: ie-bank-be
+
+  backend-deploy:
+    runs-on: ubuntu-latest
+    needs: backend-build
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: python-app
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: 'Deploy to Azure Web App'
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.USER_ALIAS }}-be-dev
+          package: .
+
+  infra-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Run Bicep linter
+        run: az bicep build --file ie-bank-infra/main.bicep
+      - name: Deploy Bicep file
+        uses: azure/arm-deploy@v1
+        with:
+          subscriptionId: ${{ env.SUBSCRIPTION_ID_DEV }}
+          resourceGroupName: ${{ env.RESOURCE_GROUP_DEV }}
+          template: ie-bank-infra/main.bicep
+          parameters: >-
+            ie-bank-infra/parameters/dev.parameters.json
+            appServiceAPIEnvVarENV=${{ env.ENV }}
+            appServiceAPIEnvVarDBHOST=${{ env.DBHOST }}
+            appServiceAPIEnvVarDBNAME=${{ env.DBNAME }}
+            appServiceAPIEnvVarDBPASS=${{ secrets.DBPASS }}
+            appServiceAPIDBHostDBUSER=${{ secrets.DBUSER }}
+            appServiceAPIDBHostFLASK_APP=${{ env.FLASK_APP }}
+            appServiceAPIDBHostFLASK_DEBUG=${{ env.FLASK_DEBUG }}
+          deploymentName: ${{ env.USER_ALIAS }}
