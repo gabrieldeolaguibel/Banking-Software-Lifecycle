@@ -7,6 +7,11 @@ Vue.use(VueRouter)
 
 const routes = [
   {
+    path: '/',
+    name: 'Home',
+    component: { template: '<div>Welcome to IE Bank!</div>'}
+  },
+  {
     path: '/skull',
     name: 'Skull',
     component: Skull
