@@ -11,8 +11,6 @@ on:
 
 env:
   USER_ALIAS: gdeolaguibel
-  FRONTEND_WEBAPP_DEV: ${{ env.USER_ALIAS }}-fe-dev
-  BACKEND_WEBAPP_DEV: ${{ env.USER_ALIAS }}-be-dev
   RESOURCE_GROUP_DEV: aguadamillas_students_1
   SUBSCRIPTION_ID_DEV: e0b9cada-61bc-4b5a-bd7a-52c606726b3b
 
@@ -57,7 +55,7 @@ jobs:
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ env.FRONTEND_WEBAPP_DEV }} 
+          app-name: ${{ env.USER_ALIAS }}-fe-dev
           package: .
 
   backend-build:
@@ -103,7 +101,7 @@ jobs:
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ env.BACKEND_WEBAPP_DEV }}
+          app-name: ${{ env.USER_ALIAS }}-be-dev
           package: .
 
   infra-deploy:
