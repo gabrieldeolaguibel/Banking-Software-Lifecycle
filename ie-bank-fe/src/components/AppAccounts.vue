@@ -173,39 +173,94 @@ export default {
     };
   },
   methods: {
-    // ... [Rest of the methods remain unchanged]
-    onSubmit(e) {
-      e.preventDefault(); //prevent default form submit form the browser
-      this.$refs.addAccountModal.hide(); //hide the modal when submitted
-      const payload = {
-        name: this.createAccountForm.name,
-        currency: this.createAccountForm.currency,
-        country: this.createAccountForm.country  // Added Country Field
-      };
-      this.RESTcreateAccount(payload);
-      this.initForm();
-    },
-      // Handle submit event for edit account
-      onSubmitUpdate(e) {
-        e.preventDefault(); //prevent default form submit form the browser
-        this.$refs.editAccountModal.hide(); //hide the modal when submitted
-        const payload = {
-          name: this.editAccountForm.name,
-        };
-        this.RESTupdateAccount(payload, this.editAccountForm.id);
-        this.initForm();
-      },
 
-      // Handle edit button
-      editAccount(account) {
-        this.editAccountForm = account;
-      },
+onSubmit(e) {
+  e.preventDefault();
+  this.$refs.addAccountModal.hide();
+  const payload = {
+    name: this.createAccountForm.name,
+    currency: this.createAccountForm.currency,
+    country: this.createAccountForm.country
+  };
+  this.RESTcreateAccount(payload);
+  this.initForm();
+},
 
-      // Handle Delete button
-      deleteAccount(account) {
-        this.RESTdeleteAccount(account.id);
-      },
-    },
+RESTcreateAccount(payload) {
+    axios.post('/accounts', payload)
+        .then(response => {
+            this.accounts.push(response.data);
+            this.showMessage = true;
+            this.message = "Account created successfully!";
+        })
+        .catch(error => {
+            console.error("Error creating account:", error);
+            this.showMessage = true;
+            this.message = "Error creating account!";
+        });
+},
+
+onSubmitUpdate(e) {
+    e.preventDefault();
+    this.$refs.editAccountModal.hide();
+    const payload = {
+      name: this.editAccountForm.name,
+    };
+    this.RESTupdateAccount(payload, this.editAccountForm.id);
+    this.initForm();
+},
+
+RESTupdateAccount(payload, id) {
+    axios.put('/accounts/' + id, payload)
+        .then(response => {
+            // Update the account in the accounts array
+            const index = this.accounts.findIndex(account => account.id === id);
+            if (index !== -1) {
+                this.accounts[index] = response.data;
+            }
+            this.showMessage = true;
+            this.message = "Account updated successfully!";
+        })
+        .catch(error => {
+            console.error("Error updating account:", error);
+            this.showMessage = true;
+            this.message = "Error updating account!";
+        });
+},
+
+editAccount(account) {
+    this.editAccountForm = account;
+},
+
+deleteAccount(account) {
+    this.RESTdeleteAccount(account.id);
+},
+
+RESTdeleteAccount(id) {
+    axios.delete('/accounts/' + id)
+        .then(() => {
+            const index = this.accounts.findIndex(account => account.id === id);
+            if (index !== -1) {
+                this.accounts.splice(index, 1);
+            }
+            this.showMessage = true;
+            this.message = "Account deleted successfully!";
+        })
+        .catch(error => {
+            console.error("Error deleting account:", error);
+            this.showMessage = true;
+            this.message = "Error deleting account!";
+        });
+},
+
+initForm() {
+    this.createAccountForm.name = "";
+    this.createAccountForm.currency = "";
+    this.createAccountForm.country = "";
+    this.editAccountForm.name = "";
+}
+},
+
 
   /***************************************************
    * LIFECYClE HOOKS
