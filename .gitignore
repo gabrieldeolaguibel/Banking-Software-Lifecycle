@@ -6,6 +6,8 @@ ie-bank-be/__pycache__/
 ie-bank-be/.env
 ie-bank-be/.vscode
 ie-bank-be/.db/
+ie-bank-be/iebank_api/__pycache__/
+__pycache__/
 
 # Frontend (ie-bank-fe) specific rules
 
