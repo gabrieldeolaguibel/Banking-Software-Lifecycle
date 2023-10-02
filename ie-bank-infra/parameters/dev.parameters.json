@@ -6,19 +6,19 @@
             "value": "nonprod"
         },
         "postgreSQLServerName": {
-            "value": "gdeolaguibeldos-dbsrv-dev"
+            "value": "golaguibel-dbsrv-dev"
         },
         "postgreSQLDatabaseName": {
-            "value": "gdeolaguibeldos-db-dev"
+            "value": "golaguibel-db-dev"
         },
         "appServicePlanName": {
-            "value": "gdeolaguibeldos-asp-dev"
+            "value": "golaguibel-asp-dev"
         },
         "appServiceAPIAppName": {
-            "value": "gdeolaguibeldos-be-dev"
+            "value": "golaguibel-be-dev"
         },
         "appServiceAppName": {
-            "value": "gdeolaguibeldos-fe-dev"
+            "value": "golaguibel-fe-dev"
         },
         "location": {
             "value": "East Asia"

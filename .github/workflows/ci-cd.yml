@@ -10,7 +10,7 @@ on:
     workflow_dispatch:
 
 env:
-  USER_ALIAS: gdeolaguibeldos
+  USER_ALIAS: golaguibel
   RESOURCE_GROUP_DEV: aguadamillas_students_1
   SUBSCRIPTION_ID_DEV: e0b9cada-61bc-4b5a-bd7a-52c606726b3b
 
