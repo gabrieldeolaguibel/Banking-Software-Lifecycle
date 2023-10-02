@@ -189,9 +189,16 @@ onSubmit(e) {
 RESTcreateAccount(payload) {
     axios.post('/accounts', payload)
         .then(response => {
-            this.accounts.push(response.data);
-            this.showMessage = true;
-            this.message = "Account created successfully!";
+            // Check if the response has the expected structure
+            if (response.data && response.data.name && response.data.account_number) {
+                this.accounts.push(response.data);
+                this.showMessage = true;
+                this.message = "Account created successfully!";
+            } else {
+                console.error("Unexpected response structure:", response.data);
+                this.showMessage = true;
+                this.message = "Error creating account due to unexpected response!";
+            }
         })
         .catch(error => {
             console.error("Error creating account:", error);
