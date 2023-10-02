@@ -253,6 +253,18 @@ RESTdeleteAccount(id) {
         });
 },
 
+RESTgetAccounts() {
+    axios.get('/accounts')
+        .then(response => {
+            this.accounts = response.data.accounts;
+        })
+        .catch(error => {
+            console.error("Error fetching accounts:", error);
+            this.showMessage = true;
+            this.message = "Error fetching accounts!";
+        });
+},
+
 initForm() {
     this.createAccountForm.name = "";
     this.createAccountForm.currency = "";
