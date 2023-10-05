@@ -6,8 +6,11 @@
           <h1>Accounts</h1>
           <hr />
           <br />
-          <!-- Alert Message -->
-          <b-alert v-if="showMessage" variant="success" show>{{ message }}</b-alert>
+          <!-- Allert Message -->
+          <b-alert v-if="showMessage" variant="success" show>{{
+            message
+          }}</b-alert>
+          <!-- b-alert v-if="error" variant="danger" show>{{ error }}</b-alert-->
 
           <button
             type="button"
@@ -24,7 +27,6 @@
                 <th scope="col">Account Number</th>
                 <th scope="col">Account Balance</th>
                 <th scope="col">Account Currency</th>
-                <th scope="col">Account Country</th> <!-- Added Country Column -->
                 <th scope="col">Account Status</th>
                 <th scope="col">Actions</th>
               </tr>
@@ -35,13 +37,15 @@
                 <td>{{ account.account_number }}</td>
                 <td>{{ account.balance }}</td>
                 <td>{{ account.currency }}</td>
-                <td>{{ account.country }}</td> <!-- Display Country for each account -->
                 <td>
                   <span
                     v-if="account.status == 'Active'"
                     class="badge badge-success"
-                  >{{ account.status }}</span>
-                  <span v-else class="badge badge-danger">{{ account.status }}</span>
+                    >{{ account.status }}</span
+                  >
+                  <span v-else class="badge badge-danger">{{
+                    account.status
+                  }}</span>
                 </td>
                 <td>
                   <div class="btn-group" role="group">
@@ -89,7 +93,8 @@
               v-model="createAccountForm.name"
               placeholder="Account Name"
               required
-            ></b-form-input>
+            >
+            </b-form-input>
           </b-form-group>
           <b-form-group
             id="form-currency-group"
@@ -102,22 +107,10 @@
               v-model="createAccountForm.currency"
               placeholder="$ or €"
               required
-            ></b-form-input>
+            >
+            </b-form-input>
           </b-form-group>
-          <!-- Added Country Input Field -->
-          <b-form-group
-            id="form-country-group"
-            label="Country:"
-            label-for="form-country-input"
-          >
-            <b-form-input
-              id="form-country-input"
-              type="text"
-              v-model="createAccountForm.country"
-              placeholder="Country"
-              required
-            ></b-form-input>
-          </b-form-group>
+
           <b-button type="submit" variant="outline-info">Submit</b-button>
         </b-form>
       </b-modal>
@@ -142,7 +135,8 @@
               v-model="editAccountForm.name"
               placeholder="Account Name"
               required
-            ></b-form-input>
+            >
+            </b-form-input>
           </b-form-group>
           <b-button type="submit" variant="outline-info">Update</b-button>
         </b-form>
@@ -162,7 +156,6 @@ export default {
       createAccountForm: {
         name: "",
         currency: "",
-        country: ""  // Added Country Field
       },
       editAccountForm: {
         id: "",
@@ -173,118 +166,138 @@ export default {
     };
   },
   methods: {
+    /***************************************************
+     * RESTful requests
+     ***************************************************/
 
-onSubmit(e) {
-  e.preventDefault();
-  this.$refs.addAccountModal.hide();
-  const payload = {
-    name: this.createAccountForm.name,
-    currency: this.createAccountForm.currency,
-    country: this.createAccountForm.country
-  };
-  this.RESTcreateAccount(payload);
-  this.initForm();
-},
-
-RESTcreateAccount(payload) {
-    axios.post('/accounts', payload)
-        .then(response => {
-            // Check if the response has the expected structure
-            if (response.data && response.data.name && response.data.account_number) {
-                this.accounts.push(response.data);
-                this.showMessage = true;
-                this.message = "Account created successfully!";
-            } else {
-                console.error("Unexpected response structure:", response.data);
-                this.showMessage = true;
-                this.message = "Error creating account due to unexpected response!";
-            }
+    //GET function
+    RESTgetAccounts() {
+      const path = `${process.env.VUE_APP_ROOT_URL}/accounts`;
+      axios
+        .get(path)
+        .then((response) => {
+          this.accounts = response.data.accounts;
         })
-        .catch(error => {
-            console.error("Error creating account:", error);
-            this.showMessage = true;
-            this.message = "Error creating account!";
+        .catch((error) => {
+          console.error(error);
         });
-},
+    },
 
-onSubmitUpdate(e) {
-    e.preventDefault();
-    this.$refs.editAccountModal.hide();
-    const payload = {
-      name: this.editAccountForm.name,
-    };
-    this.RESTupdateAccount(payload, this.editAccountForm.id);
-    this.initForm();
-},
-
-RESTupdateAccount(payload, id) {
-    axios.put('/accounts/' + id, payload)
-        .then(response => {
-            // Update the account in the accounts array
-            const index = this.accounts.findIndex(account => account.id === id);
-            if (index !== -1) {
-                this.accounts[index] = response.data;
-            }
-            this.showMessage = true;
-            this.message = "Account updated successfully!";
+    // POST function
+    RESTcreateAccount(payload) {
+      const path = `${process.env.VUE_APP_ROOT_URL}/accounts`;
+      axios
+        .post(path, payload)
+        .then((response) => {
+          this.RESTgetAccounts();
+          // For message alert
+          this.message = "Account Created succesfully!";
+          // To actually show the message
+          this.showMessage = true;
+          // To hide the message after 3 seconds
+          setTimeout(() => {
+            this.showMessage = false;
+          }, 3000);
         })
-        .catch(error => {
-            console.error("Error updating account:", error);
-            this.showMessage = true;
-            this.message = "Error updating account!";
+        .catch((error) => {
+          console.error(error);
+          this.RESTgetAccounts();
         });
-},
+    },
 
-editAccount(account) {
-    this.editAccountForm = account;
-},
-
-deleteAccount(account) {
-    this.RESTdeleteAccount(account.id);
-},
-
-RESTdeleteAccount(id) {
-    axios.delete('/accounts/' + id)
-        .then(() => {
-            const index = this.accounts.findIndex(account => account.id === id);
-            if (index !== -1) {
-                this.accounts.splice(index, 1);
-            }
-            this.showMessage = true;
-            this.message = "Account deleted successfully!";
+    // Update function
+    RESTupdateAccount(payload, accountId) {
+      const path = `${process.env.VUE_APP_ROOT_URL}/accounts/${accountId}`;
+      axios
+        .put(path, payload)
+        .then((response) => {
+          this.RESTgetAccounts();
+          // For message alert
+          this.message = "Account Updated succesfully!";
+          // To actually show the message
+          this.showMessage = true;
+          // To hide the message after 3 seconds
+          setTimeout(() => {
+            this.showMessage = false;
+          }, 3000);
         })
-        .catch(error => {
-            console.error("Error deleting account:", error);
-            this.showMessage = true;
-            this.message = "Error deleting account!";
+        .catch((error) => {
+          console.error(error);
+          this.RESTgetAccounts();
         });
-},
+    },
 
-RESTgetAccounts() {
-    axios.get('/accounts')
-        .then(response => {
-            this.accounts = response.data.accounts;
+    // Delete account
+    RESTdeleteAccount(accountId) {
+      const path = `${process.env.VUE_APP_ROOT_URL}/accounts/${accountId}`;
+      axios
+        .delete(path)
+        .then((response) => {
+          this.RESTgetAccounts();
+          // For message alert
+          this.message = "Account Deleted succesfully!";
+          // To actually show the message
+          this.showMessage = true;
+          // To hide the message after 3 seconds
+          setTimeout(() => {
+            this.showMessage = false;
+          }, 3000);
         })
-        .catch(error => {
-            console.error("Error fetching accounts:", error);
-            this.showMessage = true;
-            this.message = "Error fetching accounts!";
+        .catch((error) => {
+          console.error(error);
+          this.RESTgetAccounts();
         });
-},
+    },
 
-initForm() {
-    this.createAccountForm.name = "";
-    this.createAccountForm.currency = "";
-    this.createAccountForm.country = "";
-    this.editAccountForm.name = "";
-}
-},
+    /***************************************************
+     * FORM MANAGEMENT
+     * *************************************************/
 
+    // Initialize forms empty
+    initForm() {
+      this.createAccountForm.name = "";
+      this.createAccountForm.currency = "";
+      this.editAccountForm.id = "";
+      this.editAccountForm.name = "";
+    },
+
+    // Handle submit event for create account
+    onSubmit(e) {
+      e.preventDefault(); //prevent default form submit form the browser
+      this.$refs.addAccountModal.hide(); //hide the modal when submitted
+      const payload = {
+        name: this.createAccountForm.name,
+        currency: this.createAccountForm.currency,
+      };
+      this.RESTcreateAccount(payload);
+      this.initForm();
+    },
+
+    // Handle submit event for edit account
+    onSubmitUpdate(e) {
+      e.preventDefault(); //prevent default form submit form the browser
+      this.$refs.editAccountModal.hide(); //hide the modal when submitted
+      const payload = {
+        name: this.editAccountForm.name,
+      };
+      this.RESTupdateAccount(payload, this.editAccountForm.id);
+      this.initForm();
+    },
+
+    // Handle edit button
+    editAccount(account) {
+      this.editAccountForm = account;
+    },
+
+    // Handle Delete button
+    deleteAccount(account) {
+      this.RESTdeleteAccount(account.id);
+    },
+  },
 
   /***************************************************
    * LIFECYClE HOOKS
    ***************************************************/
-  
   created() {
     this.RESTgetAccounts();
   },

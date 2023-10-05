@@ -14,8 +14,7 @@ def skull():
 def create_account():
     name = request.json['name']
     currency = request.json['currency']
-    country = request.json.get('country', None)  # Get the country field, default to None if not provided
-    account = Account(name, currency, country)   # Update the Account instantiation
+    account = Account(name, currency)  
     db.session.add(account)
     db.session.commit()
     return format_account(account)
@@ -34,8 +33,6 @@ def get_account(id):
 def update_account(id):
     account = Account.query.get(id)
     account.name = request.json['name']
-    if 'country' in request.json:  # Check if country is provided in the request
-        account.country = request.json['country']
     db.session.commit()
     return format_account(account)
 
@@ -53,7 +50,6 @@ def format_account(account):
         'account_number': account.account_number,
         'balance': account.balance,
         'currency': account.currency,
-        'country': account.country,  # Include the country in the formatted account data
         'status': account.status,
         'created_at': account.created_at
     }

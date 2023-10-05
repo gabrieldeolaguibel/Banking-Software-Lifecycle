@@ -10,16 +10,14 @@ class Account(db.Model):
     currency = db.Column(db.String(1), nullable=False, default="€")
     status = db.Column(db.String(10), nullable=False, default="Active")
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    country = db.Column(db.String(100), nullable=True) # new field
 
 
     def __repr__(self):
         return '<Event %r>' % self.account_number
 
-    def __init__(self, name, currency, country=None): # Update the constructor to include the country field
+    def __init__(self, name, currency): # Update the constructor to include the country field
         self.name = name
         self.account_number = ''.join(random.choices(string.digits, k=20))
         self.currency = currency
-        self.country = country
         self.balance = 0.0
         self.status = "Active"
