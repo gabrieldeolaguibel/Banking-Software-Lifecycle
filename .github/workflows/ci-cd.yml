@@ -13,11 +13,11 @@ env:
   USER_ALIAS: gdeolaguibel
   RESOURCE_GROUP_DEV: aguadamillas_students_1
   SUBSCRIPTION_ID_DEV: e0b9cada-61bc-4b5a-bd7a-52c606726b3b
-  DBHOST: gdeolaguibel-dbsrv-dev.postgres.database.azure.com
-  DBNAME: gdeoloaguibel-db-dev
-  ENV: dev
-  FLASK_APP: app.py
-  FLASK_DEBUG: 1
+  #DBHOST: gdeolaguibel-dbsrv-dev.postgres.database.azure.com
+  #DBNAME: gdeoloaguibel-db-dev
+  #ENV: dev
+  #FLASK_APP: app.py
+  #FLASK_DEBUG: 1
 
 jobs:
   frontend-build:
