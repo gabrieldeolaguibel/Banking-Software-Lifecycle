@@ -1,5 +1,12 @@
 from iebank_api import app
 import pytest
+from iebank_api.models import Account
+
+@pytest.fixture
+def test_account():
+    account = Account(name="Test User", currency="$", country="USA")
+    # Save the account to the database if needed
+    return account
 
 def test_get_accounts(testing_client):
     """
@@ -36,7 +43,7 @@ def test_create_new_account(client):
         "currency": "€",
         "country": "Spain"
     }
-    response = client.post("/accounts/", json=data)
+    response = client.post("/accounts", json=data)
     assert response.status_code == 200
     assert response.json()["name"] == data["name"]
     assert response.json()["currency"] == data["currency"]
@@ -48,7 +55,7 @@ def test_create_new_account(client):
 
 def test_get_account_details(client, test_account):
     account_number = test_account.account_number
-    response = client.get(f"/accounts/{account_number}/")
+    response = client.get(f"/accounts/{account_number}")
     assert response.status_code == 200
     assert response.json()["name"] == test_account.name
     assert response.json()["currency"] == test_account.currency

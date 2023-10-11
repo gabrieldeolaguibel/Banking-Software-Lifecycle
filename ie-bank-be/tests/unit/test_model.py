@@ -28,7 +28,8 @@ def test_account_initialization():
 # Test for Account Model String Representation:
 def test_account_repr():
     account = Account(name="John Doe", currency="€", country="Spain")
-    assert repr(account) == f'<Event {account.account_number}>'
+    assert repr(account) == f"<Event '{account.account_number}'>"
+
 
 
 
