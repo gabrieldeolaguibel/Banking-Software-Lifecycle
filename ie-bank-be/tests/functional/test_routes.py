@@ -29,6 +29,30 @@ def test_create_account(testing_client):
     response = testing_client.post('/accounts', json={'name': 'John Doe', 'currency': '€', 'country': 'CountryName'}) # Added country
     assert response.status_code == 200
 
+# Test for Creating a New Account with Valid Data:
+def test_create_new_account(client):
+    data = {
+        "name": "John Doe",
+        "currency": "€",
+        "country": "Spain"
+    }
+    response = client.post("/accounts/", json=data)
+    assert response.status_code == 200
+    assert response.json()["name"] == data["name"]
+    assert response.json()["currency"] == data["currency"]
+    assert response.json()["country"] == data["country"]
+    assert response.json()["balance"] == 0.0
+    assert response.json()["status"] == "Active"
+
+# Test for Fetching Account Details with Valid Account Number:
+
+def test_get_account_details(client, test_account):
+    account_number = test_account.account_number
+    response = client.get(f"/accounts/{account_number}/")
+    assert response.status_code == 200
+    assert response.json()["name"] == test_account.name
+    assert response.json()["currency"] == test_account.currency
+    assert response.json()["country"] == test_account.country
 
 
 
