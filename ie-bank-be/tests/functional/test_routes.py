@@ -33,19 +33,20 @@ def test_create_account(testing_client):
 def test_update_account(client):
     # Create a new account
     response = client.post('/accounts', json={
-        'name': 'John Doe',
-        'balance': 1000.0,
-        'country': 'US'
+    'name': 'John Doe',
+    #'balance': 1000.0,
+    'country': 'US',
+    'currency': '$'  # Add this line
     })
     account_id = response.json['id']
 
     # Update the account
-    response = client.put(f'/accounts/{account_id}', json={
-        'name': 'Jane Doe',
-        'balance': 1500.0,
-        'country': 'UK'
+    response = client.post('/accounts', json={
+    'name': 'John Doe',
+    #'balance': 1000.0,
+    'country': 'US',
+    'currency': '#'  # Add this line
     })
-
     assert response.status_code == 200
     assert response.json['name'] == 'Jane Doe'
     assert response.json['balance'] == 1500.0
@@ -58,7 +59,7 @@ def test_delete_account(client):
     response = client.post('/accounts', json={
         'name': 'John Doe',
         'balance': 1000.0,
-        'country': 'US'
+        'country': '$'
     })
     account_id = response.json['id']
 
