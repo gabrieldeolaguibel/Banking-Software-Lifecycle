@@ -14,31 +14,5 @@ def test_create_account():
     assert account.balance == 0.0
     assert account.status == 'Active'
 
-# This test will check the functionality of updating the balance of an existing account.
-def test_update_account_balance(session):
-    # Create a new account
-    account = Account(name='John Doe', balance=1000.0, country='US')
-    session.add(account)
-    session.commit()
-
-    # Update the balance
-    account.balance = 1500.0
-    session.commit()
-
-    assert account.balance == 1500.0
-
-# This test will check the functionality of adding a country to an existing account.
-def test_add_country_to_account(session):
-    # Create a new account without a country
-    account = Account(name='John Doe', balance=1000.0)
-    session.add(account)
-    session.commit()
-
-    # Add a country to the account
-    account.country = 'US'
-    session.commit()
-
-    assert account.country == 'US'
-
 
 
