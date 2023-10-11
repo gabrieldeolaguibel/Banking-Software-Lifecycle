@@ -14,7 +14,7 @@ def test_create_account():
     assert account.balance == 0.0
     assert account.status == 'Active'
 
-# Test for Account Model Initialization:
+# New Test: Test for Account Model Initialization:
 def test_account_initialization():
     account = Account(name="John Doe", currency="€", country="Spain")
     assert account.name == "John Doe"
@@ -25,7 +25,7 @@ def test_account_initialization():
     assert len(account.account_number) == 20
 
 
-# Test for Account Model String Representation:
+# New Test: Test for Account Model String Representation:
 def test_account_repr():
     account = Account(name="John Doe", currency="€", country="Spain")
     assert repr(account) == f"<Event '{account.account_number}'>"
