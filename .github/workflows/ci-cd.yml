@@ -1,131 +1,217 @@
+# All workflows combined in a single file
 name: Unified CI/CD Pipeline
 
 on:
-    push:
-      branches:
-        - main
-    pull_request:
-      branches:
-        - main
-    workflow_dispatch:
+  push:
+    branches:
+      - "*" # All branches
+  pull_request:
+    branches:
+      - "*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
 
 env:
-  USER_ALIAS: gdeolaguibel
+  BACKEND_WEBAPP_DEV: gdeolaguibel-be-dev
+  FRONTEND_WEBAPP_DEV: gdeolaguibel-fe-dev
+  BACKEND_WEBAPP_UAT: gdeolaguibel-be-uat
+  FRONTEND_WEBAPP_UAT: gdeolaguibel-fe-uat
   RESOURCE_GROUP_DEV: aguadamillas_students_1
+  RESOURCE_GROUP_UAT: aguadamillas_students_1
+  SUBSCRIPTION_ID_UAT: e0b9cada-61bc-4b5a-bd7a-52c606726b3b
   SUBSCRIPTION_ID_DEV: e0b9cada-61bc-4b5a-bd7a-52c606726b3b
 
 jobs:
-  frontend-build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: ie-bank-fe/node_modules
-          key: ${{ runner.OS }}-node-${{ hashFiles('ie-bank-fe/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-node-
-      - name: npm install, build, and test
-        run: |
-          cd ie-bank-fe
-          npm install
-          npm run build -- --mode development --dest dist-dev
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
-        with:
-          name: node-app-dev
-          path: ie-bank-fe/dist-dev/
-
-  frontend-deploy:
-    runs-on: ubuntu-latest
-    needs: frontend-build
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: node-app-dev
-      - uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.USER_ALIAS }}-fe-dev
-          package: .
-
   backend-build:
     runs-on: ubuntu-latest
+    env:
+      ENV: ghci
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.11
         uses: actions/setup-python@v3
         with:
           python-version: "3.11"
-      - name: Upgrade pip and Install dependencies
-        run: |
-          cd ie-bank-be
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+        working-directory: ./ie-bank-be
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+        working-directory: ./ie-bank-be
       - name: Lint with flake8
         run: |
-          cd ie-bank-be
           pip install flake8 pytest
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        working-directory: ./ie-bank-be
       - name: Test with pytest
-        run: |
-          cd ie-bank-be
-          python -m pytest --cov=iebank_api -v
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v2
+        run: python -m pytest --cov=iebank_api -v
+        working-directory: ./ie-bank-be
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v3
         with:
           name: python-app
-          path: ie-bank-be
+          path: ./ie-bank-be
 
-  backend-deploy:
+  backend-deploy-dev:
+    if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: backend-build
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v2
+      - name: Download backend artifact
+        uses: actions/download-artifact@v3
         with:
           name: python-app
+          path: .
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy to Azure Web App (Backend)
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ env.USER_ALIAS }}-be-dev
+          app-name: ${{ env.BACKEND_WEBAPP_DEV }}
+          package: ./
+
+  backend-deploy-uat:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: backend-build
+    steps:
+      - name: Download backend artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: python-app
+          path: .
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Deploy to Azure Web App (Backend)
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.BACKEND_WEBAPP_UAT }}
+          package: ./
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+          cache: "npm"
+          cache-dependency-path: ie-bank-fe/package-lock.json # Specify the path to package lock file
+
+      - name: npm install, build, and test (Frontend) - dev
+        if: github.ref != 'refs/heads/main'
+        run: |
+          cd ie-bank-fe
+          npm install
+          npm run build -- --mode development --dest dist-dev
+
+      - name: Upload frontend artifact
+        if: github.ref != 'refs/heads/main'
+        uses: actions/upload-artifact@v3
+        with:
+          name: node-app-dev
+          path: ie-bank-fe/dist-dev/
+
+      - name: npm install, build, and test (Frontend) - uat
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cd ie-bank-fe
+          npm install
+          npm run build -- --mode production --dest dist-production
+
+      - name: Upload frontend artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v3
+        with:
+          name: node-app-production
+          path: ie-bank-fe/dist-production/
+
+  frontend-deploy-dev:
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: frontend-build
+    steps:
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: node-app-dev
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Deploy to Azure Web App (Frontend)
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.FRONTEND_WEBAPP_DEV }}
           package: .
 
-  infra-deploy:
+  frontend-deploy-uat:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: frontend-build
+    steps:
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: node-app-production
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Deploy to Azure Web App (Frontend)
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.FRONTEND_WEBAPP_UAT }}
+          package: .
+
+  infra-deploy-dev:
+    if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
+      - name: Run Bicep linter
+        run: az bicep build --file ./main.bicep
+        working-directory: ./ie-bank-infra
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: Run Bicep linter
-        run: az bicep build --file ie-bank-infra/main.bicep
       - name: Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
           subscriptionId: ${{ env.SUBSCRIPTION_ID_DEV }}
           resourceGroupName: ${{ env.RESOURCE_GROUP_DEV }}
-          template: ie-bank-infra/main.bicep
-          parameters: >-
-            ie-bank-infra/parameters/dev.parameters.json
-            appServiceAPIEnvVarENV=${{ env.ENV }}
-            appServiceAPIEnvVarDBHOST=${{ env.DBHOST }}
-            appServiceAPIEnvVarDBNAME=${{ env.DBNAME }}
-            appServiceAPIEnvVarDBPASS=${{ secrets.DBPASS }}
-            appServiceAPIDBHostDBUSER=${{ secrets.DBUSER }}
-            appServiceAPIDBHostFLASK_APP=${{ env.FLASK_APP }}
-            appServiceAPIDBHostFLASK_DEBUG=${{ env.FLASK_DEBUG }}
-          deploymentName: ${{ env.USER_ALIAS }}
+          template: ./ie-bank-infra/main.bicep
+          parameters: ./ie-bank-infra/parameters/dev.parameters.json appServiceAPIEnvVarENV=${{ vars.ENV }} appServiceAPIEnvVarDBHOST=${{ vars.DBHOST }} appServiceAPIEnvVarDBNAME=${{ vars.DBNAME }} appServiceAPIEnvVarDBPASS=${{ secrets.DBPASS }} appServiceAPIDBHostDBUSER=${{ secrets.DBUSER }} appServiceAPIDBHostFLASK_APP=${{ vars.FLASK_APP }} appServiceAPIDBHostFLASK_DEBUG=${{ vars.FLASK_DEBUG }}
+
+  infra-deploy-uat:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: "User Acceptance Testing"
+    env:
+      ENV: uat
+      DBHOST: gdeolaguibel-dbsrv-uat.postgres.database.azure.com
+      DBNAME: gdeolaguibel-db-uat
+      FLASK_APP: ./ie-bank-be/app.py
+      FLASK_DEBUG: 1
+    steps:
+      - uses: actions/checkout@main
+      - name: Run Bicep linter
+        run: az bicep build --file ./main.bicep
+        working-directory: ./ie-bank-infra
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Deploy Bicep file
+        uses: azure/arm-deploy@v1
+        with:
+          subscriptionId: ${{ env.SUBSCRIPTION_ID_UAT }}
+          resourceGroupName: ${{ env.RESOURCE_GROUP_UAT }}
+          template: ./ie-bank-infra/main.bicep
+          parameters: ./ie-bank-infra/parameters/uat.parameters.json appServiceAPIEnvVarENV=${{ env.ENV }} appServiceAPIEnvVarDBHOST=${{ env.DBHOST }} appServiceAPIEnvVarDBNAME=${{ env.DBNAME }} appServiceAPIEnvVarDBPASS=${{ secrets.DBPASS }} appServiceAPIDBHostDBUSER=${{ secrets.DBUSER }} appServiceAPIDBHostFLASK_APP=${{ env.FLASK_APP }} appServiceAPIDBHostFLASK_DEBUG=${{ env.FLASK_DEBUG }}

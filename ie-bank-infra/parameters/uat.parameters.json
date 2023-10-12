@@ -3,22 +3,22 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "environmentType": {
-             "value": "nonprod"  
+             "value": "prod"  
         },
         "postgreSQLServerName": {
-            "value": "gdeolaguibel-dbsrv-dev"
+            "value": "gdeolaguibel-dbsrv-uat"
         },
         "postgreSQLDatabaseName": {
-            "value": "gdeolaguibel-db-dev"
+            "value": "gdeolaguibel-db-uat"
         },
         "appServicePlanName": {
-            "value": "gdeolaguibel-asp-dev"
+            "value": "gdeolaguibel-asp-uat"
         },
         "appServiceAPIAppName": {
-            "value": "gdeolaguibel-be-dev"
+            "value": "gdeolaguibel-be-uat"
         },
         "appServiceAppName": {
-            "value": "gdeolaguibel-fe-dev"
+            "value": "gdeolaguibel-fe-uat"
         },
         "location": {
             "value": "East Asia"

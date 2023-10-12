@@ -14,6 +14,7 @@
             "label": "vuejs: start",
             "type": "npm",
             "script": "serve",
+            "args": ["--mode", "local"],
             "isBackground": true,
             "options": {
                 "cwd": "${workspaceFolder}/ie-bank-fe"

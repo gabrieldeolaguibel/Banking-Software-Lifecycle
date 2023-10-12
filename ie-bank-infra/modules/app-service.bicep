@@ -6,7 +6,7 @@ param appServiceAPIEnvVarENV string
 param appServiceAPIEnvVarDBHOST string
 param appServiceAPIEnvVarDBNAME string
 @secure()
-param appServiceAPIEnvVarDBPASS string
+param appServiceAPIEnvVarDBPASS string 
 param appServiceAPIDBHostDBUSER string
 param appServiceAPIDBHostFLASK_APP string
 param appServiceAPIDBHostFLASK_DEBUG string
