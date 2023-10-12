@@ -33,7 +33,8 @@
         "DBUSER": "",
         "DBPASS": "",
         "DBHOST": "",
-        "DBNAME": ""
+        "DBNAME": "",
+        "APPLICATIONINSIGHTS_CONNECTION_STRING": "InstrumentationKey=MY_KEY"
       },
       "args": [
         "run",
