@@ -5,7 +5,6 @@ param appServiceAPIAppName string
 param appServiceAPIEnvVarENV string
 param appServiceAPIEnvVarDBHOST string
 param appServiceAPIEnvVarDBNAME string
-param INSTRUMENTATION_KEY string
 @secure()
 param appServiceAPIEnvVarDBPASS string 
 param appServiceAPIDBHostDBUSER string
@@ -76,7 +75,7 @@ resource appServiceAPIApp 'Microsoft.Web/sites@2022-03-01' = {
         }
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: INSTRUMENTATION_KEY
+          value: '197a63a4-a5c4-40fc-8c79-b2a418d94463'
         }
       ]
     }
