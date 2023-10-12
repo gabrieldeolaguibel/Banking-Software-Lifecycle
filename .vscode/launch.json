@@ -34,7 +34,7 @@
         "DBPASS": "",
         "DBHOST": "",
         "DBNAME": "",
-        "APPLICATIONINSIGHTS_CONNECTION_STRING": "InstrumentationKey=MY_KEY"
+        "APPLICATIONINSIGHTS_CONNECTION_STRING": "InstrumentationKey=197a63a4-a5c4-40fc-8c79-b2a418d94463"
       },
       "args": [
         "run",
