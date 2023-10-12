@@ -19,6 +19,8 @@ env:
   FRONTEND_WEBAPP_DEV: gdeolaguibel-fe-dev
   BACKEND_WEBAPP_UAT: gdeolaguibel-be-uat
   FRONTEND_WEBAPP_UAT: gdeolaguibel-fe-uat
+  APPINSIGHTS_NAME_DEV: gdeolaguibel-ai-dev
+  APPINSIGHTS_NAME_UAT: gdeolaguibel-ai-uat
   RESOURCE_GROUP_DEV: aguadamillas_students_1
   RESOURCE_GROUP_UAT: aguadamillas_students_1
   SUBSCRIPTION_ID_UAT: e0b9cada-61bc-4b5a-bd7a-52c606726b3b
@@ -188,6 +190,12 @@ jobs:
           resourceGroupName: ${{ env.RESOURCE_GROUP_DEV }}
           template: ./ie-bank-infra/main.bicep
           parameters: ./ie-bank-infra/parameters/dev.parameters.json appServiceAPIEnvVarENV=${{ vars.ENV }} appServiceAPIEnvVarDBHOST=${{ vars.DBHOST }} appServiceAPIEnvVarDBNAME=${{ vars.DBNAME }} appServiceAPIEnvVarDBPASS=${{ secrets.DBPASS }} appServiceAPIDBHostDBUSER=${{ secrets.DBUSER }} appServiceAPIDBHostFLASK_APP=${{ vars.FLASK_APP }} appServiceAPIDBHostFLASK_DEBUG=${{ vars.FLASK_DEBUG }}
+      - name: Get Application Insights Instrumentation Key
+        id: get-key
+        run: |
+          echo "Fetching Instrumentation Key..."
+          key=$(az resource show --resource-group ${{ env.RESOURCE_GROUP_DEV }} --name ${{ env.APPINSIGHTS_NAME_DEV }} --resource-type "Microsoft.Insights/components" --query properties.InstrumentationKey -o tsv)
+          echo "INSTRUMENTATION_KEY=$key" >> $GITHUB_ENV
 
   infra-deploy-uat:
     if: github.ref == 'refs/heads/main'
@@ -215,3 +223,9 @@ jobs:
           resourceGroupName: ${{ env.RESOURCE_GROUP_UAT }}
           template: ./ie-bank-infra/main.bicep
           parameters: ./ie-bank-infra/parameters/uat.parameters.json appServiceAPIEnvVarENV=${{ env.ENV }} appServiceAPIEnvVarDBHOST=${{ env.DBHOST }} appServiceAPIEnvVarDBNAME=${{ env.DBNAME }} appServiceAPIEnvVarDBPASS=${{ secrets.DBPASS }} appServiceAPIDBHostDBUSER=${{ secrets.DBUSER }} appServiceAPIDBHostFLASK_APP=${{ env.FLASK_APP }} appServiceAPIDBHostFLASK_DEBUG=${{ env.FLASK_DEBUG }}
+      - name: Get Application Insights Instrumentation Key
+        id: get-key
+        run: |
+          echo "Fetching Instrumentation Key..."
+          key=$(az resource show --resource-group ${{ env.RESOURCE_GROUP_UAT }} --name ${{ env.APPINSIGHTS_NAME_UAT }} --resource-type "Microsoft.Insights/components" --query properties.InstrumentationKey -o tsv)
+          echo "INSTRUMENTATION_KEY=$key" >> $GITHUB_ENV
