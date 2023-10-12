@@ -20,6 +20,12 @@
         "appServiceAppName": {
             "value": "gdeolaguibel-fe-dev"
         },
+        "azureMonitorName": {
+            "value": "gdeolaguibel-am-dev"
+        },
+        "appInsightsName": {
+            "value": "gdeolaguibel-ai-dev"
+        },
         "location": {
             "value": "East Asia"
         }
