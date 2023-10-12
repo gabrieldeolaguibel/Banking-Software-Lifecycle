@@ -39,21 +39,21 @@ def test_create_account(testing_client):
 
 # New test 1:
 def test_update_account(testing_client):
-    """
-    GIVEN a Flask application
-    WHEN the '/accounts/<int:id>' page is posted to (PUT)
-    THEN check the response is valid
-    """
+    
+    #GIVEN a Flask application
+    #WHEN the '/accounts/<int:id>' page is posted to (PUT)
+    #THEN check the response is valid
+    
     response = testing_client.put('/accounts/1', json={'name': 'Johnny Doe', 'currency': '€', 'country': 'CountryName'})
     assert response.status_code == 200
 
 # New test 2:
 def test_delete_account(testing_client):
-    """
-    GIVEN a Flask application
-    WHEN the '/accounts/<int:id>' page is posted to (DELETE)
-    THEN check the response is valid
-    """
+    
+    #GIVEN a Flask application
+    #WHEN the '/accounts/<int:id>' page is posted to (DELETE)
+    #THEN check the response is valid
+    
     response = testing_client.delete('/accounts/1')
     assert response.status_code == 200
 
