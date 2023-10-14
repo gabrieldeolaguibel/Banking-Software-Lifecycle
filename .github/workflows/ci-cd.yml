@@ -19,6 +19,8 @@ env:
   FRONTEND_WEBAPP_DEV: gdeolaguibel-fe-dev
   BACKEND_WEBAPP_UAT: gdeolaguibel-be-uat
   FRONTEND_WEBAPP_UAT: gdeolaguibel-fe-uat
+  APPINSIGHTS_NAME_DEV: gdeolaguibel-ai-dev
+  APPINSIGHTS_NAME_UAT: gdeolaguibel-ai-uat
   RESOURCE_GROUP_DEV: aguadamillas_students_1
   RESOURCE_GROUP_UAT: aguadamillas_students_1
   SUBSCRIPTION_ID_UAT: e0b9cada-61bc-4b5a-bd7a-52c606726b3b
@@ -59,7 +61,7 @@ jobs:
   backend-deploy-dev:
     if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: backend-build
+    needs: [backend-build, infra-deploy-dev]
     steps:
       - name: Download backend artifact
         uses: actions/download-artifact@v3
@@ -78,7 +80,7 @@ jobs:
   backend-deploy-uat:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: backend-build
+    needs: [backend-build, infra-deploy-uat]
     steps:
       - name: Download backend artifact
         uses: actions/download-artifact@v3
@@ -137,7 +139,7 @@ jobs:
   frontend-deploy-dev:
     if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: frontend-build
+    needs: [frontend-build, infra-deploy-dev]
     steps:
       - name: Download frontend artifact
         uses: actions/download-artifact@v3
@@ -155,7 +157,7 @@ jobs:
   frontend-deploy-uat:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: frontend-build
+    needs: [frontend-build, infra-deploy-uat]
     steps:
       - name: Download frontend artifact
         uses: actions/download-artifact@v3
@@ -188,6 +190,7 @@ jobs:
           resourceGroupName: ${{ env.RESOURCE_GROUP_DEV }}
           template: ./ie-bank-infra/main.bicep
           parameters: ./ie-bank-infra/parameters/dev.parameters.json appServiceAPIEnvVarENV=${{ vars.ENV }} appServiceAPIEnvVarDBHOST=${{ vars.DBHOST }} appServiceAPIEnvVarDBNAME=${{ vars.DBNAME }} appServiceAPIEnvVarDBPASS=${{ secrets.DBPASS }} appServiceAPIDBHostDBUSER=${{ secrets.DBUSER }} appServiceAPIDBHostFLASK_APP=${{ vars.FLASK_APP }} appServiceAPIDBHostFLASK_DEBUG=${{ vars.FLASK_DEBUG }}
+
 
   infra-deploy-uat:
     if: github.ref == 'refs/heads/main'
